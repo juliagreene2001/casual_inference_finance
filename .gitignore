@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (keep folder, ignore downloaded files)
+data/*
+!data/.gitkeep
+
+# Results (keep folder, ignore generated outputs)
+results/*
+!results/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

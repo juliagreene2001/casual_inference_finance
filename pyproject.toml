@@ -1,0 +1,21 @@
+[project]
+name = "casual-inference-finance"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "yfinance>=1.7.0",
+]
+
+[project.scripts]
+casual-inference-finance = "casual_inference_finance:main"
+
+[build-system]
+requires = ["uv_build>=0.12.15,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+]
