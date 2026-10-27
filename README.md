@@ -26,8 +26,8 @@ M2 Causal Inference project — Albert School. Estimating the causal effect of F
 
 | Step              | What to do                                                                                                                              | Notebook output                |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| 1. Question       | Name the unit (trading day/window), treatment **T** (rate hike/cut/hold), outcome **Y** (S&amp;P 500 return), effect type (ATE/ATT/ATU) | One-sentence causal question   |
-| 2. Variables      | Identify confounders (pre-FOMC inflation, GDP growth, prior volatility) — never control for post-treatment variables                    | Table of variables + role      |
+| 1. Question       | Name the unit (calendar month), treatment **T** (rate hike/cut/hold), outcome **Y** (S&amp;P 500 return), effect type (ATE/ATT/ATU) | One-sentence causal question   |
+| 2. Variables      | Identify confounders (previously available inflation, growth, and market conditions) — never control for post-treatment variables                    | Table of variables + role      |
 | 3. Method         | Pick method based on how treatment was assigned (see below)                                                                             | Method + key assumption        |
 | 4. Compare groups | Check treated vs. control periods for pre-treatment similarity                                                                          | Descriptive table + plots      |
 | 5. Estimate       | Naive difference first, then method-based estimate                                                                                      | Effect + confidence interval   |
@@ -43,7 +43,18 @@ M2 Causal Inference project — Albert School. Estimating the causal effect of F
 4. **Observational study** — are main confounders observed in the data?
 5. If none fit: refine the question.
 
-Given Fed decisions apply market-wide (no untreated control group of "S&amp;P 500s"), **Synthetic Control** (using other indices/assets as controls) or **event-study / DiD across sectors or asset classes** is the likely fit — not a simple observational regression.
+The available data are monthly. Begin with descriptive monthly associations. A causal method must address policy endogeneity, anticipation, omitted confounders, and serial dependence. DiD requires credible comparison units and parallel trends; synthetic control requires donors unaffected by the intervention. Other markets may also respond to US monetary policy, so they are not automatically valid controls.
+
+## Monthly data preparation
+
+Run `uv sync`, select the project environment as the notebook kernel, and place the FRED CSV at `data/FEDFUNDS.csv` with columns `observation_date,FEDFUNDS`. Downloaded datasets remain excluded from Git. Record the CSV download date in the notebook.
+
+- One row represents one calendar month. Daily S&P 500 closes are reduced to the last observed close in each completed month; the current month is excluded.
+- FEDFUNDS is a monthly average of daily effective rates, in percent ([FRED documentation](https://fred.stlouisfed.org/series/FEDFUNDS)). Its month-start date labels the entire month; it does not imply availability on that date.
+- `sp500_return = close[t] / close[t-1] - 1` is a price return, excluding dividends. `rate_change_pp = FEDFUNDS[t] - FEDFUNDS[t-1]` is in percentage points.
+- The descriptive exposure is the average-rate change in month t; `next_month_return` is the price return in month t+1. Direction labels describe effective-rate movements, not individual policy decisions or monetary surprises.
+- Missing months remain missing. Returns, changes, and leads are computed on a complete calendar index before incomplete analysis rows are removed. No forward fill is used.
+- This alignment does not establish causality. Announcement effects require higher-frequency data and a separate identification design. Confounders require publication-aware timing; lagging revised macro data alone does not eliminate look-ahead bias.
 
 ## Deliverables
 
