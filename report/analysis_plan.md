@@ -71,3 +71,11 @@ Cuts versus holds, hike size, other horizons, and effects by how expected the hi
 - The 3-month spread and its 21-day change are now among the regression controls.
 - Placebo windows have the same length as the outcome window, and their controls are measured before they open.
 - Every main-table interval uses the same 97.5% level.
+
+## Addendum, written after the final run
+
+The sections above are unchanged since the freeze; git history shows the original commit. These items were added afterwards and are labelled in the notebook and the report. None of them changes the headline estimate or the rule.
+
+- **Influence checks:** added because dropping a few windows moved the 21-day result more than expected.
+- **Within-band estimator:** added as a simple, transparent comparison of hikes and holds with similar propensity.
+- **Synthetic control evidence:** the pass-through test uses scheduled meetings only, because intermeeting moves are announced at irregular hours.
