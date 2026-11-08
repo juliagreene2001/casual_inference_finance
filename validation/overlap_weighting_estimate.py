@@ -4,6 +4,10 @@ main notebook. Rebuilds the same per-meeting table and propensity model as
 notebooks/report_notebook.ipynb (cells 3 and 5), then weights each hike by 1 - e(X)
 and each hold by e(X) instead of dropping meetings above a cutoff.
 
+The propensity model is refit separately for each horizon, after dropping meetings with
+no outcome at that horizon, matching the notebook's own convention (Section 6.6) rather
+than fitting one propensity model on the full sample and reusing it at both horizons.
+
 Run with `uv run python validation/overlap_weighting_estimate.py`.
 """
 
@@ -84,14 +88,13 @@ def main() -> None:
     panel = pd.read_csv(DATA_FILE, parse_dates=["date"])
     hike_hold = build_hike_hold(panel)
 
-    propensity_model = sm.Logit(hike_hold["hike"], sm.add_constant(hike_hold[PROPENSITY])).fit(disp=0)
-    e = propensity_model.predict(sm.add_constant(hike_hold[PROPENSITY]))
-    hike_hold["overlap_weight"] = np.where(hike_hold["hike"] == 1, 1 - e, e)
-
     rows = []
     for horizon_key, horizon_label in HORIZONS.items():
-        used = hike_hold.dropna(subset=[horizon_key])
-        fit = smf.wls(f"{horizon_key} ~ hike", data=used, weights=used.loc[used.index, "overlap_weight"]).fit(cov_type="HC3")
+        used = hike_hold.dropna(subset=[horizon_key]).copy()
+        propensity_model = sm.Logit(used["hike"], sm.add_constant(used[PROPENSITY])).fit(disp=0)
+        e = propensity_model.predict(sm.add_constant(used[PROPENSITY]))
+        used["overlap_weight"] = np.where(used["hike"] == 1, 1 - e, e)
+        fit = smf.wls(f"{horizon_key} ~ hike", data=used, weights=used["overlap_weight"]).fit(cov_type="HC3")
         low, high = fit.conf_int(alpha=0.025).loc["hike"]
         rows.append({"Horizon": horizon_label, "Estimator": "Overlap weighting (ATO)",
                       "Estimate": fit.params["hike"], "Low": low, "High": high, "N": int(len(used))})

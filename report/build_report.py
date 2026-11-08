@@ -24,7 +24,14 @@ from reportlab.platypus import (
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = ROOT / "results"
 OUTPUT = ROOT / "report" / "fed_sp500_report.pdf"
-FONTS = Path("/System/Library/Fonts/Supplemental")
+
+# Font directories to search, in order, so the report builds on macOS, Windows or Linux.
+FONT_DIRS = [
+    Path("/System/Library/Fonts/Supplemental"),       # macOS
+    Path("C:/Windows/Fonts"),                          # Windows
+    Path("/usr/share/fonts/truetype/msttcorefonts"),   # Linux, if the MS core fonts are installed
+    Path("/usr/share/fonts/truetype/liberation"),      # Linux, metric-compatible fallback
+]
 
 AUTHOR = "Ali Vakof and Julia Greene"
 COMPANY_LINK = (
@@ -107,10 +114,30 @@ assert (checks[checks["Outcome"] == "y21"]["Estimate"] < 0).all(), "The prose be
 assert n["n_cycles"] == 7 and n["n_controls"] == 18 and top["top_date"] == "2008-09-16", "The prose names these directly."
 
 # ----- Fonts and styles
-for name, file in [("Body", "Times New Roman.ttf"), ("Body-Bold", "Times New Roman Bold.ttf"), ("Body-Italic", "Times New Roman Italic.ttf"),
-                   ("Body-BoldItalic", "Times New Roman Bold Italic.ttf"), ("Sans", "Arial.ttf"), ("Sans-Bold", "Arial Bold.ttf"),
-                   ("Sans-Italic", "Arial Italic.ttf"), ("Sym", "Arial Unicode.ttf")]:
-    pdfmetrics.registerFont(TTFont(name, FONTS / file))
+FONT_CANDIDATES = {
+    "Body": ["Times New Roman.ttf", "times.ttf", "LiberationSerif-Regular.ttf"],
+    "Body-Bold": ["Times New Roman Bold.ttf", "timesbd.ttf", "LiberationSerif-Bold.ttf"],
+    "Body-Italic": ["Times New Roman Italic.ttf", "timesi.ttf", "LiberationSerif-Italic.ttf"],
+    "Body-BoldItalic": ["Times New Roman Bold Italic.ttf", "timesbi.ttf", "LiberationSerif-BoldItalic.ttf"],
+    "Sans": ["Arial.ttf", "arial.ttf", "LiberationSans-Regular.ttf"],
+    "Sans-Bold": ["Arial Bold.ttf", "arialbd.ttf", "LiberationSans-Bold.ttf"],
+    "Sans-Italic": ["Arial Italic.ttf", "ariali.ttf", "LiberationSans-Italic.ttf"],
+    # Needs broad symbol coverage (e.g. the independence sign, |=), not just Latin text.
+    "Sym": ["Arial Unicode.ttf", "seguisym.ttf", "DejaVuSans.ttf"],
+}
+
+
+def find_font(candidates: list[str]) -> Path:
+    for directory in FONT_DIRS:
+        for file in candidates:
+            path = directory / file
+            if path.exists():
+                return path
+    raise FileNotFoundError(f"No font file found among {candidates} under {[str(d) for d in FONT_DIRS]}")
+
+
+for name, candidates in FONT_CANDIDATES.items():
+    pdfmetrics.registerFont(TTFont(name, find_font(candidates)))
 pdfmetrics.registerFontFamily("Body", normal="Body", bold="Body-Bold", italic="Body-Italic", boldItalic="Body-BoldItalic")
 pdfmetrics.registerFontFamily("Sans", normal="Sans", bold="Sans-Bold", italic="Sans-Italic", boldItalic="Sans-Bold")
 

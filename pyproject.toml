@@ -1,19 +1,22 @@
 [project]
-name = "casual-inference-finance"
+name = "causal-inference-finance"
 version = "0.1.0"
-description = "Add your description here"
+description = "Does a Fed rate hike move the S&P 500? An observational causal study of FOMC decisions."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "certifi>=2026.10.23",
     "matplotlib>=3.11.2",
     "pandas>=3.1.0",
+    "reportlab>=5.1.0",
     "scikit-learn>=1.9.1",
     "scipy>=1.18.1",
     "statsmodels>=0.15.0",
+    "yfinance>=1.8.0",
 ]
 
 [project.scripts]
-casual-inference-finance = "casual_inference_finance:main"
+causal-inference-finance = "causal_inference_finance:main"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
@@ -21,9 +24,6 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "certifi>=2026.10.23",
     "ipykernel>=7.4.0",
     "nbconvert>=7.17.2",
-    "reportlab>=5.1.0",
-    "yfinance>=1.8.0",
 ]

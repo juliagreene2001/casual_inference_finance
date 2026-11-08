@@ -1,6 +1,6 @@
 """Which horizon is actually best-powered to detect a plausible effect?
 
-Suggestion #3 in suggestions.md proposes sizing the horizon to the effect, rather than
+The Check finding in validation/README.md proposes sizing the horizon to the effect, rather than
 picking a horizon for substantive relevance and discovering afterward it's underpowered.
 This script does that: it computes sigma (hold-group return SD) at every horizon the
 notebook already has data for (0, 1, 5, 10, 21, 42, 63 trading days), then reports, at the

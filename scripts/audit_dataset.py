@@ -1,8 +1,11 @@
 """Check notebooks/fed_sp500_daily.csv against sources not used to build it.
 
 Run with `uv run python scripts/audit_dataset.py`. It compares the decision labels
-with the Fed's own list of target changes and a second Kaggle dataset, and the
-S&P 500 closes with Yahoo Finance. The notebook does not need this script.
+with the Fed's own list of target changes and a second Kaggle dataset. S&P 500
+closes are also compared against a fresh yfinance pull: this is no longer an
+independent-source check (both come from Yahoo Finance since build_dataset.py
+switched off Kaggle), only a build-integrity check that the panel's values still
+match a live pull. The notebook does not need this script.
 """
 
 import io
@@ -75,7 +78,8 @@ def main():
     closes = yf.download("^GSPC", start="1982-01-01", auto_adjust=False, progress=False)["Close"]
     closes = closes.iloc[:, 0] if isinstance(closes, pd.DataFrame) else closes
     both = pd.concat([panel.set_index("date")["sp500_close"], closes.rename("yahoo")], axis=1, sort=True).dropna()
-    print(f"S&P 500 vs Yahoo Finance: {len(both)} days; largest gap {((both['sp500_close'] / both['yahoo'] - 1).abs().max()) * 100:.5f}%")
+    print(f"S&P 500 vs a fresh yfinance pull (build-integrity check, same source): {len(both)} days; "
+          f"largest gap {((both['sp500_close'] / both['yahoo'] - 1).abs().max()) * 100:.5f}%")
 
 
 if __name__ == "__main__":
