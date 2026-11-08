@@ -26,7 +26,7 @@ RESULTS = ROOT / "results"
 OUTPUT = ROOT / "report" / "fed_sp500_report.pdf"
 FONTS = Path("/System/Library/Fonts/Supplemental")
 
-AUTHOR = "Ali Vakof"
+AUTHOR = "Ali Vakof and Julia Greene"
 COMPANY_LINK = (
     "<b>Link to a company.</b> A company treasury with stock-market exposure, or one planning a share issue, "
     "must decide whether to hedge or to wait when a hike approaches. It cannot change the Fed's decision, only "
