@@ -84,6 +84,9 @@ def fake(horizon, test, column):
 estimates_21 = [n["main"][k][0] for k in n["main"] if k.startswith("21-day")]
 estimates_2 = [n["main"][k][0] for k in n["main"] if k.startswith("2-day")]
 contested_21 = [n["main"][f"21-day|{m}"][0] for m in ["Standardisation, contested", "Weighting, contested", "Within bands, contested"]]
+overlap_21 = n["overlap"]["21-day"]
+assert min(contested_21) <= overlap_21[0] <= max(contested_21), "The prose says overlap weighting falls inside the contested range."
+
 controls_low, controls_high = group_range("y21", "Control set")
 cycle_low, cycle_high = group_range("y21", "Leave a cycle out")
 subset_low, subset_high = group_range("y21", "Subset")
@@ -370,7 +373,8 @@ story += [
          f"This fits anticipation: by the day before, a hike is mostly priced in."),
     para(f"<b>The following month: a lean, not a finding.</b> All seven estimates are negative, from {num(max(estimates_21))} to {num(min(estimates_21))}, and all intervals include zero. The regression gives {estimate('21-day|Regression')}, with <i>p</i> = {num(n['reg_p_y21'], 3)}, which misses our 2.5% level. "
          f"In plain terms: the data lean toward a hike lowering the next month's return by one to three points, but they cannot exclude zero."),
-    para(f"<b>The size is less certain than the sign.</b> The largest estimates are the ones that extrapolate to hikes with no comparable holds. Estimates restricted to contested hikes are smaller, from {num(max(contested_21))} to {num(min(contested_21))}. One meeting also matters a great deal: "
+    para(f"<b>The size is less certain than the sign.</b> The largest estimates are the ones that extrapolate to hikes with no comparable holds. Estimates restricted to contested hikes are smaller, from {num(max(contested_21))} to {num(min(contested_21))}. "
+         f"Overlap weighting (Li, Morgan and Zaslavsky, 2018), added after the plan was frozen, needs no cut-off: it weights each hike by 1 − <i>e</i> and each hold by <i>e</i>, targets meetings where both decisions were plausible, and gives {num(overlap_21[0])} ({between(overlap_21[1], overlap_21[2])}), inside the contested range. One meeting also matters a great deal: "
          f"16 September 2008, the day after Lehman Brothers failed, was a hold followed by a {num(abs(top['top_return']), 1)}% fall. Its extreme yields tilt the regression, and without it the estimate is {num(without_top[0])} (Table 6). We keep it in the headline, as the plan requires, and we report the difference."),
     table("Table 6. The five meetings that most move the 21-day regression (headline: " + num(n["main"]["21-day|Regression"][0]) + ")", influence_rows, [0.3, 0.2, 0.25, 0.25]),
     para(f"<b>For whom?</b> The credible statement covers contested hikes, about {n['hikes_contested']} of {n['n_hike']}, where a hold was realistic. For the {n['hikes_above_contested']} hikes that looked close to certain the day before, the data cannot say what a hold would have done, because the Fed almost never held in those conditions."),
@@ -437,6 +441,7 @@ for reference in [
     "Diallo, A. (2026). <i>Causal Inference</i>, course sessions and labs, Albert School.",
     "Holland, P. (1986). Statistics and causal inference. <i>Journal of the American Statistical Association</i> 81(396).",
     "Jarociński, M. and Karadi, P. (2020). Deconstructing monetary policy surprises: the role of information shocks. <i>American Economic Journal: Macroeconomics</i> 12(2).",
+    "Li, F., Morgan, K. L. and Zaslavsky, A. M. (2018). Balancing covariates via propensity score weighting. <i>Journal of the American Statistical Association</i> 113(521).",
     "Lucca, D. and Moench, E. (2015). The pre-FOMC announcement drift. <i>Journal of Finance</i> 70(1).",
     "Miranda-Agrippino, S. and Rey, H. (2020). U.S. monetary policy and the global financial cycle. <i>Review of Economic Studies</i> 87(6).",
     "Nakamura, E. and Steinsson, J. (2018). High-frequency identification of monetary non-neutrality: the information effect. <i>Quarterly Journal of Economics</i> 133(3).",
