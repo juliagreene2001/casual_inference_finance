@@ -1,8 +1,8 @@
 """Overlap-weighted estimate of the hike/hold effect (Li, Morgan & Zaslavsky, 2018),
 as an alternative to the hard 0.9 propensity cutoff used for "contested hikes" in the
 main notebook. Rebuilds the same per-meeting table and propensity model as
-notebooks/report_notebook.ipynb (cells 3 and 5), then weights every meeting by
-e(X)(1-e(X)) instead of dropping meetings above a cutoff.
+notebooks/report_notebook.ipynb (cells 3 and 5), then weights each hike by 1 - e(X)
+and each hold by e(X) instead of dropping meetings above a cutoff.
 
 Run with `uv run python validation/overlap_weighting_estimate.py`.
 """
@@ -86,7 +86,7 @@ def main() -> None:
 
     propensity_model = sm.Logit(hike_hold["hike"], sm.add_constant(hike_hold[PROPENSITY])).fit(disp=0)
     e = propensity_model.predict(sm.add_constant(hike_hold[PROPENSITY]))
-    hike_hold["overlap_weight"] = e * (1 - e)
+    hike_hold["overlap_weight"] = np.where(hike_hold["hike"] == 1, 1 - e, e)
 
     rows = []
     for horizon_key, horizon_label in HORIZONS.items():

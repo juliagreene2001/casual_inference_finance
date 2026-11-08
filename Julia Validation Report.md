@@ -106,8 +106,8 @@ choice is the one place in the whole analysis where switching flips the 21-day c
 acknowledgment of the extrapolation, with the contested-only estimates given equal visual
 weight. Validated an additional, less arbitrary method — **overlap weighting**
 (`validation/overlap_weighting_estimate.py`) — which avoids the 0.9 hard cutoff entirely by
-weighting every meeting by `e(X)(1-e(X))`. Result: −0.12 [−0.82, +0.58] at 2 days, −1.33
-[−3.12, +0.45] at 21 days — closer to the naive gap than to regression, consistent with the
+weighting each hike by `1 - e(X)` and each hold by `e(X)`. Result: −0.21 [−1.01, +0.60] at 2 days, −1.39
+[−3.57, +0.78] at 21 days — closer to the naive gap than to regression, consistent with the
 pattern that the more a method relies on extrapolation, the larger its estimate.
 
 ## Check

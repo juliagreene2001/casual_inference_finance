@@ -79,3 +79,5 @@ The sections above are unchanged since the freeze; git history shows the origina
 - **Influence checks:** added because dropping a few windows moved the 21-day result more than expected.
 - **Within-band estimator:** added as a simple, transparent comparison of hikes and holds with similar propensity.
 - **Synthetic control evidence:** the pass-through test uses scheduled meetings only, because intermeeting moves are announced at irregular hours.
+- **Overlap weighting:** added after our internal review as a check on the 0.9 cut-off that defines contested hikes. It targets meetings where both decisions were plausible, not the ATT, and it is not part of the rule. Notebook Section 6.6.
+- **Further questions:** whether rate cuts lift stocks, and how many hikes it would take to detect an effect of a given size. Added at the end of the project as exploration, not evidence. Notebook Section 8; the report quotes one sentence from each.

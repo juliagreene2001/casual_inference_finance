@@ -29,13 +29,12 @@ Or open the notebook in any Jupyter environment and use **Restart and Run All**.
 ```
 .
 ├── notebooks/
-│   ├── report_notebook.ipynb    # main analysis, the guide's seven steps
+│   ├── report_notebook.ipynb    # main analysis: the guide's seven steps, then two further questions
 │   └── fed_sp500_daily.csv      # the one data file
 ├── report/
 │   ├── fed_sp500_report.pdf     # the report
 │   ├── build_report.py          # builds the PDF from results/
-│   ├── analysis_plan.md         # plan frozen before the final run
-│   └── oral_defence_notes.md    # preparation for the oral
+│   └── analysis_plan.md         # plan frozen before the final run
 ├── scripts/
 │   ├── build_dataset.py         # downloads public data and builds the CSV
 │   └── audit_dataset.py         # checks the CSV against independent sources

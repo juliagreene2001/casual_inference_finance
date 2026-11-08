@@ -35,8 +35,8 @@ not as a co-headline.
 
 | Horizon | Regression (all hikes, extrapolated) | Standardisation, contested | Overlap weighting |
 |----|---|---|---|
-| 2-day   | −0.31 [−1.11, +0.49] | −0.38 [−1.10, +0.64] | −0.12 [−0.82, +0.58] |
-| 21-day  | **−2.94** [−6.01, +0.13] | −2.44 [−5.75, +0.23] | −1.33 [−3.12, +0.45] |
+| 2-day   | −0.31 [−1.11, +0.49] | −0.38 [−1.10, +0.64] | −0.21 [−1.01, +0.60] |
+| 21-day  | **−2.94** [−6.01, +0.13] | −2.44 [−5.75, +0.23] | −1.39 [−3.57, +0.78] |
 
 Standardisation on *all* hikes (−3.22) is even more extreme than regression — both lean on
 units with no real counterfactual. Restricting to contested hikes pulls the estimate back
@@ -51,13 +51,18 @@ much that extrapolation matters.
 
 **Validated with an additional method:** `validation/overlap_weighting_estimate.py`
 (+ `validation/overlap_weighting_results.csv`) implements overlap weighting
-(Li, Morgan & Zaslavsky, 2018) — weighting every meeting by `e(X)(1-e(X))` instead of
+(Li, Morgan & Zaslavsky, 2018) — weighting each hike by `1 - e(X)` and each hold by `e(X)` instead of
 hard-cutting at propensity 0.9. It avoids the arbitrary "contested" threshold entirely.
-Result: −0.12 [−0.82, +0.58] at 2 days, −1.33 [−3.12, +0.45] at 21 days — closer to the
+Result: −0.21 [−1.01, +0.60] at 2 days, −1.39 [−3.57, +0.78] at 21 days — closer to the
 naive gap than to regression, and does not exclude zero at either horizon. This supports
 the suggestion above: the further a method leans on extrapolation (regression > hard-cutoff
 contested > overlap weighting), the larger the estimate gets, and the smoothest, least
 extrapolation-dependent method agrees with "no effect credibly detected."
+
+*Corrected after review: the first version gave every meeting the same weight `e(X)(1-e(X))`,
+which leaves hikes and holds unbalanced, and reported −0.12 and −1.33. The notebook repeats
+this check in Section 6.6, refitting the propensity inside a year-block bootstrap:
+−0.21 [−1.03, +0.70] at 2 days and −1.47 [−3.82, +0.19] at 21 days.*
 
 ## 3. Propose a follow-up study designed around the power problem
 
@@ -121,3 +126,8 @@ figure (4.2) — the gap is the overlap problem from Step 4: the effective numbe
 holds (Kish ESS) is only 11-28, not 178, and this simplified two-group formula doesn't capture
 that shrinkage. A real follow-up study would need to address overlap (e.g. point 2 above), not
 just add more calendar years of data at the 21-day horizon.
+
+*Follow-up: the notebook's Section 8.2 measures this with the regression's own standard error.
+With the real number of holds the two-group formula gives 2.05 points at 21 days; the controls,
+which predict 58% of the decision, and the robust standard errors take it to 4.23. Detecting a
+2-point effect reliably would take about 232 hikes, roughly 146 years of decisions.*
