@@ -29,7 +29,7 @@ Or open the notebook in any Jupyter environment and use **Restart and Run All**.
 ```
 .
 ├── notebooks/
-│   ├── report_notebook.ipynb    # main analysis, the guide's seven steps
+│   ├── report_notebook.ipynb    # main analysis: the guide's seven steps, then two further questions
 │   └── fed_sp500_daily.csv      # the one data file
 ├── report/
 │   ├── fed_sp500_report.pdf     # the report

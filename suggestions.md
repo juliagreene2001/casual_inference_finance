@@ -126,3 +126,8 @@ figure (4.2) — the gap is the overlap problem from Step 4: the effective numbe
 holds (Kish ESS) is only 11-28, not 178, and this simplified two-group formula doesn't capture
 that shrinkage. A real follow-up study would need to address overlap (e.g. point 2 above), not
 just add more calendar years of data at the 21-day horizon.
+
+*Follow-up: the notebook's Section 8.2 measures this with the regression's own standard error.
+With the real number of holds the two-group formula gives 2.05 points at 21 days; the controls,
+which predict 58% of the decision, and the robust standard errors take it to 4.23. Detecting a
+2-point effect reliably would take about 232 hikes, roughly 146 years of decisions.*

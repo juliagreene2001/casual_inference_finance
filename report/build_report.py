@@ -362,6 +362,11 @@ for key, label in labels.items():
     rule_rows.append([label, "Pass" if n["rule"]["2-day"][key] else "Fail", "Pass" if n["rule"]["21-day"][key] else "Fail"])
 rule_rows.append(["Causal effect claimed?", "No", "No"])
 cuts = {r["Horizon"]: r for r in n["exploratory"] if r["Comparison"] == "Cut vs hold"}
+cut_question = n["cut_question"]
+assert cut_question["before_21d"]["Cuts"] < 0 < cut_question["before_21d"]["Holds"], "The prose says stocks fell before cuts and rose before holds."
+assert cut_question["21-day|Overlap weighting"][1] < 0 < cut_question["21-day|Overlap weighting"][2], "The prose says the cut interval includes zero."
+power_21 = n["power"]["21-day"]
+assert COMPANY_THRESHOLD == 2, "The power sentence quotes the 2-point numbers of notebook Section 8.2."
 influence_rows = [["Meeting", "Decision", "21-day return", "Regression without it"]]
 for _, row in influence[influence["horizon"] == "21-day"].iterrows():
     influence_rows.append([f"{row['date'].day} {row['date'].strftime('%B %Y')}", row["decision"].capitalize(), f"{signed(row['return'], 1)}%", num(row["estimate_without"])])
@@ -381,8 +386,9 @@ story += [
     figure("fig6_dynamic.png", "<b>Figure 6.</b> The gap by horizon (exploratory; Newey-West 95% intervals). It builds over weeks and shows no reversal within three months.", width=WIDTH * 0.9),
     table("Table 7. Applying the rule fixed before the final run", rule_rows, [0.62, 0.19, 0.19], bold_rows=(5,)),
     para(f"At 2 days there is little to detect. At 21 days both falsification tests pass, and the result fails for <b>lack of precision</b>, which is different from being refuted. The regression can reliably detect only effects of at least {num(n['mde_y1'], 1)} points at 2 days and {num(n['mde_y21'], 1)} at 21 days (80% power at the 2.5% level). "
-         f"So a {COMPANY_THRESHOLD}-point effect, our illustrative threshold for acting, could exist and go undetected. The literature points the same way: Bernanke and Kuttner (2005) find about 1% for a surprise 25 basis point cut, and most hikes are largely expected, so the average effect may lie below what this sample can see."),
-    para(f"<b>Cuts (exploratory).</b> Cuts versus holds give {num(cuts['21-day']['Naive'])} raw and {num(cuts['21-day']['Regression'])} adjusted at 21 days (standard errors {num(cuts['21-day']['Naive SE'])} and {num(cuts['21-day']['Regression SE'])}). Cuts are even more predictable than hikes (AUC {num(n['cut_auc'])}), so we draw no conclusion."),
+         f"So a {COMPANY_THRESHOLD}-point effect, our illustrative threshold for acting, could exist and go undetected; detecting it reliably would take about {power_21['Hikes needed, 2 points']:.0f} hikes, roughly {power_21['Years needed, 2 points']:.0f} years of decisions at the pace since 1994. The literature points the same way: Bernanke and Kuttner (2005) find about 1% for a surprise 25 basis point cut, and most hikes are largely expected, so the average effect may lie below what this sample can see."),
+    para(f"<b>Cuts (exploratory).</b> Cuts versus holds give {num(cuts['21-day']['Naive'])} raw and {num(cuts['21-day']['Regression'])} adjusted at 21 days (standard errors {num(cuts['21-day']['Naive SE'])} and {num(cuts['21-day']['Regression SE'])}). Cuts are even more predictable than hikes (AUC {num(n['cut_auc'])}), so we draw no conclusion. "
+         f"They also follow bad news: in the month before a cut the S&P had fallen {num(-cut_question['before_21d']['Cuts'])}% on average, against a rise of {num(cut_question['before_21d']['Holds'])}% before a hold, so the raw gap mostly shows the crises that bring cuts. Overlap weighting gives {signed(cut_question['21-day|Overlap weighting'][0])} ({between(*cut_question['21-day|Overlap weighting'][1:])}) at 21 days, too wide to tell help from harm."),
 ]
 
 # ----- 7. Checks and limits
