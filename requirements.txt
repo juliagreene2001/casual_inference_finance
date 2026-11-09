@@ -1,6 +1,13 @@
+# Needed to run the notebook (Restart and Run All)
 numpy
 pandas
 scipy
 matplotlib
 statsmodels
 scikit-learn
+
+# Needed only to rebuild the data (scripts/build_dataset.py, scripts/audit_dataset.py)
+# or the PDF report (report/build_report.py)
+certifi
+reportlab
+yfinance

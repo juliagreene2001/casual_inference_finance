@@ -9,12 +9,10 @@ what was known by the close of that date. The one exception is
 fedfunds_month_avg, which is used only to audit the old monthly labels.
 """
 
-import io
 import re
 import ssl
 import time
 import urllib.request
-import zipfile
 from pathlib import Path
 
 import certifi
@@ -35,7 +33,6 @@ FRED_SERIES = [
     "CPIAUCSL", "UNRATE", "INDPRO",          # the Fed's mandate, monthly
     "FEDFUNDS",                              # monthly average rate, audit only
 ]
-KAGGLE_SP500 = "https://www.kaggle.com/api/v1/datasets/download/paveljurke/s-and-p-500-gspc-historical-data"
 FOMC_CALENDAR = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
 FOMC_HISTORICAL = "https://www.federalreserve.gov/monetarypolicy/fomchistorical{year}.htm"
 DONORS = {
@@ -68,20 +65,27 @@ def download_raw() -> None:
     (RAW / "fomc").mkdir(parents=True, exist_ok=True)
     for series in FRED_SERIES:
         download(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}", RAW / f"{series}.csv")
-    download(KAGGLE_SP500, RAW / "kaggle_sp500.zip")
     download(FOMC_CALENDAR, RAW / "fomc" / "calendars.htm")
     for year in range(1994, 2021):
         download(FOMC_HISTORICAL.format(year=year), RAW / "fomc" / f"h{year}.htm")
+
+    sp500_path = RAW / "sp500.csv"
     donors_path = RAW / "donors.csv"
-    if not donors_path.exists():
+    if not sp500_path.exists() or not donors_path.exists():
         import yfinance as yf  # only this script needs it, never the notebook
 
-        closes = {}
-        for name, ticker in DONORS.items():
-            data = yf.download(ticker, start="1990-01-01", auto_adjust=False, progress=False)
-            close = data["Close"]
-            closes[name] = close.iloc[:, 0] if isinstance(close, pd.DataFrame) else close
-        pd.DataFrame(closes).to_csv(donors_path)
+        if not sp500_path.exists():
+            close = yf.download("^GSPC", start="1950-01-01", auto_adjust=False, progress=False)["Close"]
+            close = close.iloc[:, 0] if isinstance(close, pd.DataFrame) else close
+            close.rename("sp500_close").to_csv(sp500_path)
+
+        if not donors_path.exists():
+            closes = {}
+            for name, ticker in DONORS.items():
+                data = yf.download(ticker, start="1990-01-01", auto_adjust=False, progress=False)
+                close = data["Close"]
+                closes[name] = close.iloc[:, 0] if isinstance(close, pd.DataFrame) else close
+            pd.DataFrame(closes).to_csv(donors_path)
 
 
 def fred(series: str) -> pd.Series:
@@ -177,9 +181,7 @@ def as_known(series: pd.Series, months: pd.PeriodIndex) -> np.ndarray:
 
 
 def build_panel() -> pd.DataFrame:
-    with zipfile.ZipFile(RAW / "kaggle_sp500.zip") as archive:
-        sp500_file = archive.read("sap500.csv")
-    sp500 = pd.read_csv(io.BytesIO(sp500_file), parse_dates=["Date"]).set_index("Date")["Close"].dropna()
+    sp500 = pd.read_csv(RAW / "sp500.csv", index_col=0, parse_dates=True)["sp500_close"].dropna()
     sp500 = sp500[sp500.index >= START].sort_index()
     trading_days = sp500.index
 
